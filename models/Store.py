@@ -12,5 +12,12 @@ class Store(SQLModel, table=True):
 class StoreCreateIn(SQLModel):
     name:Optional[str] = Field(default=None)
 
+
 class StoreCreateOut(SQLModel):
     name:Optional[str] = Field(default=None)
+
+
+class StoreOut(SQLModel):
+    id:Optional[int] = Field()
+    name:Optional[str] = Field()
+    owner:Optional[str] = Field()
