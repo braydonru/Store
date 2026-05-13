@@ -14,9 +14,9 @@ user_router = APIRouter(prefix="/users", tags=["users"])
 
 @user_router.get("/get_user", response_model=List[UserCreateOut])
 def get_user(db:SessionDep, u:Annotated[str,Depends(require_role(["SuperAdmin", "Admin"]))])->List[UserCreateOut]:
-    response = select(User)
+    response = select(User).filter(User.role!="SuperAdmin")
     users = db.exec(response).all()
-    return [UserCreateOut(name=u.name, username=u.username, role=u.role)for u in users]
+    return [UserCreateOut(id=u.id,name=u.name, username=u.username, role=u.role)for u in users]
 
 @user_router.post("/create_worker")
 def create_worker(db:SessionDep, u:Annotated[str,Depends(require_role(['Admin', "SuperAdmin"]))], store_id:int, user:UserCreateIn):
@@ -47,7 +47,7 @@ def create_user(db:SessionDep,user: UserCreateIn)->UserCreateOut:
     return UserCreateOut(name=user.name, username=user.username)
 
 @user_router.put("/set_role")
-def set_role(db:SessionDep,role:str,id:int, u:Annotated[str,Depends(require_role(["Admin"]))])->UserCreateOut:
+def set_role(db:SessionDep,role:str,id:int, u:Annotated[str,Depends(require_role(["SuperAdmin"]))])->UserCreateOut:
     user = db.get(User,id)
     user.role = role
     db.commit()
@@ -68,4 +68,4 @@ def get_user_by_store(db:SessionDep,store_id:int)->List[UserCreateOut]:
         raise HTTPException(status_code=404, detail="Store not found")
     users_db = select(User).where(User.store_id == store_id)
     users = db.exec(users_db).all()
-    return [UserCreateOut(name=u.name, username=u.username, role = u.role) for u in users]
+    return [UserCreateOut(id=u.id,name=u.name, username=u.username, role = u.role) for u in users]

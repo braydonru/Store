@@ -19,6 +19,7 @@ class UserCreateIn(SQLModel):
     store_id: Optional[int] = Field(default=0)
 
 class UserCreateOut(SQLModel):
+    id:Optional[int] = Field(default=None)
     name: Optional[str] = Field(default=None)
     username: Optional[str] = Field(default=None, unique=True)
     role: Optional[str] = Field(default=None)
